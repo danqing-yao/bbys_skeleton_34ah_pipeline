@@ -1,64 +1,92 @@
-# bbys_skeleton_34ah_pipeline
-Barnebys Skeleton Pipeline - 34 Auction Houses
+# Barnebys Skeleton Pipeline - 34 Auction Houses
 
 Measuring the incremental value Barnebys users bring to Skeleton auction houses at scale
 
-🎯 Project Overview
-This repository contains the full data pipeline for analyzing 34 Skeleton auction houses, measuring the value Barnebys users bring compared to other traffic sources across 2025.
-An expansion of the [Olséns pilot analysis](link to pilot repo), this pipeline automates data extraction across multiple databases and processes them through a unified BigQuery analytics layer.
-Key Metrics Analyzed:
+---
 
-User engagement (clicks, registrations, bids, winners)
-Conversion rates (bidders → winners)
-Revenue attribution (winning value, commissions, Skeleton fees)
-Barnebys incremental value (price formation impact)
-Auction house performance tiering (High / Mid / Low)
+## 🎯 Project Overview
 
-Time Period: January – December 2025 (excluding June–July)
-Data Platform: Google BigQuery
-Dataset: barnebys-skeleton.42ah
-Auction Houses: 34 Skeleton clients
+This repository contains the full data pipeline for analyzing **34 Skeleton auction houses**, measuring the value Barnebys users bring compared to other traffic sources across 2025.
 
-🏗️ Architecture Overview
-Skeleton SQL Server (34 DBs)     AWS MySQL          Azure MySQL
-         ↓                           ↓                   ↓
-    extract.py ──────────────────────────────────────────┘
-         ↓
-    load.py → BigQuery (42ah dataset)
-         ↓
-    Raw Layer (SQL)
-         ↓
-    Processed Layer (SQL)
-         ↓
-    Analytics Layer (SQL)
-         ↓
-    Looker Studio Dashboard
+An expansion of the [Olséns pilot analysis](link: https://github.com/danqing-yao/pilot-olsens), this pipeline automates data extraction across multiple databases and processes them through a unified BigQuery analytics layer.
 
-🚀 Quick Start
-Prerequisites
+### Key Metrics Analyzed
 
-Python 3.x with dependencies: pyodbc, pymysql, pandas, sshtunnel, azure-identity, google-cloud-bigquery
-Azure CLI (az login) for Skeleton SQL Server authentication
-SSH key for AWS tunnel (bbys_tech_eu.pem)
-BigQuery project access: barnebys-skeleton
+- User engagement (Clicks, registrations, bids, winners)
+- Bidding behavior (Price formation impact, Bbys incremental value, category segment)
+- Revenue attribution (Value/influence, efficiency, monetisation)
+- Auction house performance tiering (High / Mid / Low)
 
-Installation
-bashpip install pyodbc pymysql pandas sshtunnel azure-identity google-cloud-bigquery
-az login
-Run the Pipeline
-bash# Run full pipeline (extraction + SQL processing)
-python main.py
-```
+### Project Scope
 
-`main.py` will:
-1. Loop through all 34 auction houses → extract from Skeleton SQL Server
-2. Extract lot data from AWS and Azure
-3. Load all raw data to BigQuery
-4. Run all SQL scripts in order
+- **Time Period:** January – December 2025 (excluding June–July)  
+- **Data Platform:** Google BigQuery  
+- **Dataset:** `barnebys-skeleton.42ah`  
+- **Auction Houses:** 34 Skeleton clients  
 
 ---
 
+## 🏗️ Architecture Overview
+
+Skeleton SQL Server (34 DBs) AWS MySQL Azure MySQL
+↓                                ↓          ↓
+extract.py ──────────────────────────────────────────┘
+↓
+load.py → BigQuery (42ah dataset)
+(UPLOAD .csv files to BigQuery : clicks/registrations/bids from BITE, auction_house, currency_eur, skeleton_pricing))
+↓
+Raw Layer (SQL)
+↓
+Processed Layer (SQL)
+↓
+Analytics Layer (SQL)
+↓
+Looker Studio Dashboard
+
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.x  
+- Dependencies:
+  - `pyodbc`
+  - `pymysql`
+  - `pandas`
+  - `sshtunnel`
+  - `azure-identity`
+  - `google-cloud-bigquery`
+- Azure CLI (`az login`)
+- SSH key for AWS tunnel (`bbys_tech_eu.pem`)
+- BigQuery project access: `barnebys-skeleton`
+
+---
+
+### Installation
+
+```bash
+pip install pyodbc pymysql pandas sshtunnel azure-identity google-cloud-bigquery
+az login
+```
+
+**Run the Pipeline**
+
+```bash
+# Run full pipeline (extraction + SQL processing)
+python main.py
+```
+
+main.py will:
+
+- Loop through all 34 auction houses → extract from Skeleton SQL Server
+- Extract lot data from AWS and Azure
+- Load all raw data to BigQuery
+- Run all SQL scripts in order
+
 ## 📁 Repository Structure
+
 ```
 bbys_skeleton_34ah_pipeline/
 ├── README.md
@@ -67,9 +95,9 @@ bbys_skeleton_34ah_pipeline/
 ├── load.py                            # BigQuery loader
 ├── main.py                            # Pipeline orchestrator
 └── sql/
-    ├── update_raw_bite_bids.sql        # Fix currency for specific auction houses
-    ├── raw_bbys_lots.sql               # Merge & deduplicate AWS + Azure lots
-    ├── raw_bite_bids_clean.sql         # Deduplicate Bite bids
+    ├── update_raw_bite_bids.sql
+    ├── raw_bbys_lots.sql
+    ├── raw_bite_bids_clean.sql
     ├── proc_skeleton_auctions_with_bite_bids.sql
     ├── proc_skeleton_auctions_with_enteredbids.sql
     ├── proc_skeleton_auctions_with_winning.sql
@@ -77,20 +105,56 @@ bbys_skeleton_34ah_pipeline/
     ├── ana_bids_with_price_tier.sql
     ├── ana_winning_bids_with_price_tier.sql
     ├── ana_barnebys_increment.sql
-    ├── ana_funnel_all_stats.sql        # Wide table: all metrics by ah + source
-    ├── ana_funnel_excluded67_unpivoted.sql  # Unpivoted long format
-    ├── ana_funnel_excluded67.sql       # Final funnel with percentages & ah names
-    └── ana_skeleton_fee.sql            # Skeleton fee calculation + bbys_tier
+    ├── ana_funnel_all_stats.sql
+    ├── ana_funnel_excluded67_unpivoted.sql
+    ├── ana_funnel_excluded67.sql
+    └── ana_skeleton_fee.sql
+└── Tables/Google Drive
+```
 
-🗂️ Key Tables
-Input Tables
-TableDescriptionSourceraw_skeleton_auctionsAuction & inventory records from all 34 AHsSkeleton SQL Serverraw_skeleton_enteredbidsAll entered bid recordsSkeleton SQL Serverraw_bbys_aws_lotsLot metadata Nov 2024 – May 2025AWS MySQLraw_bbys_azure_lotsLot metadata Jun – Dec 2025Azure MySQLraw_bite_clicksClick events by auction house & monthBiteraw_bite_registrationsUser registration eventsBiteraw_skeleton_pricingFee structure per auction house (Fixed/Percent/Hybrid)Manualraw_currency_eurEUR exchange rates for 2025Manualraw_auction_houseAuction house reference dataManual
-Output Tables
-TableDescriptionproc_skeleton_auctions_with_enteredbidsBids matched to EnteredBid with WebUserid & sourceproc_skeleton_auctions_with_winningBids with winning flags & commissionsana_funnel_all_statsWide table: all metrics by auction house + user sourceana_funnel_excluded67_unpivotedLong format funnel metricsana_funnel_excluded67Final funnel with percentages, ordering & AH namesana_barnebys_incrementLot-level Barnebys price incrementana_skeleton_feeMonthly Skeleton fee per AH with bbys_tier classification
+---
 
-⚙️ Configuration
-All pipeline parameters are defined in config.py:
-pythonCONFIG = {
+## 🗂️ Key Tables
+
+### Input Tables
+
+| Table                    | Description                        | Source              |
+| ------------------------ | ---------------------------------- | ------------------- |
+| raw_skeleton_auctions    | Auction & inventory records        | Skeleton SQL Server |
+| raw_skeleton_enteredbids | All entered bid records            | Skeleton SQL Server |
+| raw_bbys_aws_lots        | Lot metadata (Nov 2024 – May 2025) | AWS MySQL           |
+| raw_bbys_azure_lots      | Lot metadata (Jun – Dec 2025)      | Azure MySQL         |
+| raw_bite_clicks          | Click events                       | Bite BigQuery       |
+| raw_bite_registrations   | Registration events                | Bite BigQuery       |
+| raw_bite_bids            | Bid events                         | Bite BigQuery       |
+| raw_skeleton_pricing     | Fee structure per auction house    | Manual              |
+| raw_currency_eur         | EUR exchange rates (2025)          | Manual              |
+| raw_auction_house        | Auction house reference data       | Manual              |
+
+### Output Tables
+
+| Table                                   | Description                               |
+| --------------------------------------- | ----------------------------------------- |
+| proc_skeleton_auctions_with_enteredbids | Bids matched with EnteredBid              |
+| proc_skeleton_auctions_with_winning     | Winning bids & commissions                |
+| ana_lot_price_tiers                     | Lot-level price tier classification       |
+| ana_bids_with_price_tier                | All bids enriched with price tier         |
+| ana_winning_bids_with_price_tier        | All winning bids enriched with price tier |
+| ana_funnel_all_stats                    | Wide metrics table                        |
+| ana_funnel_excluded67_unpivoted         | Long format funnel                        |
+| ana_funnel_excluded67                   | Final funnel                              |
+| ana_barnebys_increment                  | Lot-level price increment                 |
+| ana_skeleton_fee                        | Monthly fee per AH                        |
+
+
+---
+
+## ⚙️ Configuration
+
+All pipeline parameters are defined in **config.py**:
+
+```Python
+CONFIG = {
     "bq_project": "barnebys-skeleton",
     "bq_dataset": "42ah",
     "skeleton_start": "2025-01-01",
@@ -100,18 +164,37 @@ pythonCONFIG = {
     "bbys_azure_start": "2025-06-01",
     "bbys_azure_end":   "2025-12-31",
 }
-To update date ranges or add auction houses, edit config.py only — no changes needed elsewhere.
+```
 
-⚠️ Known Issues & Limitations
+👉 To update date ranges or auction houses, edit only **config.py**
 
-Dataset naming: Folder and dataset named 42ah for historical reasons; actual pipeline covers 34 auction houses
-Currency fixes: Two auction houses have hardcoded currency corrections in update_raw_bite_bids.sql (Bastionen → DKK, Dahlstroms → EUR)
-June–July exclusion: Excluded from all analytics due to source tracking issues
-Skeleton settlement timing: Commission settled by enddate, not bid timestamp — cross-month auctions may cause small period discrepancies
-Azure AD token expiry: Long extraction loops may trigger token expiry; main.py handles automatic retry with az login
-MyntAuktioner (2659): Special handling — only March, May, July months required in ana_skeleton_fee
+---
+
+## ⚠️ Known Issues & Limitations
+
+- Dataset naming: 42ah is historical; actual pipeline is 34 auction houses
+
+- Currency fixes: Hardcoded in update_raw_bite_bids.sql
+  Bastionen → DKK
+  Dahlstroms → EUR
+
+- June–July exclusion: Missing tracking data
+
+- Skeleton settlement timing: Based on enddate, not bid timestamp
+
+- Azure AD token expiry: Auto-retry handled in main.py
+
+- MyntAuktioner (2659): Special month handling in ana_skeleton_fee
+
+---
+## 📚 Dashboard
+
+Access: https://lookerstudio.google.com/s/ih_glLZb8FA
+
+**How to Refresh
+- Re-run SQL scripts
+- Open Looker Studio dashboard
+- Click Refresh data on the data source connected to barnebys-skeleton.pilot_olsens
 
 
-📚 Documentation
-Detailed Technical Documentation: [Link to Google Doc]
-Related: [Olséns Pilot Analysis](link to pilot repo) — single auction house proof-of-concept this pipeline is based on
+---
