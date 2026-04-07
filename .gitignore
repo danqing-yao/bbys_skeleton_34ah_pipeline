@@ -1,2 +1,4 @@
 Tables/bite_42_bids.csv
 Tables/*.csv
+__pycache__/
+*.pyc
