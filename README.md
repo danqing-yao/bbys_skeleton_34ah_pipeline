@@ -44,25 +44,6 @@ Analytics Layer (SQL)
 Looker Studio Dashboard
 ```
 
-
-```markdown
-```mermaid
-flowchart TD
-    A[Skeleton SQL Server (34 DBs)]
-    B[AWS MySQL]
-    C[Azure MySQL]
-
-    A --> D[extract.py]
-    B --> D
-    C --> D
-
-    D --> E[load.py → BigQuery (42ah dataset)]
-    E --> F[Raw Layer (SQL)]
-    F --> G[Processed Layer (SQL)]
-    G --> H[Analytics Layer (SQL)]
-    H --> I[Looker Studio Dashboard]
-```
-
 ---
 
 ## 🚀 Quick Start
@@ -210,7 +191,7 @@ CONFIG = {
 
 Access: https://lookerstudio.google.com/s/ih_glLZb8FA
 
-**How to Refresh
+**How to Refresh**
 - Re-run SQL scripts
 - Open Looker Studio dashboard
 - Click Refresh data on the data source connected to barnebys-skeleton.pilot_olsens
