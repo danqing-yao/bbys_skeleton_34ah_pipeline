@@ -27,7 +27,7 @@ An expansion of the [Olséns pilot analysis](link: https://github.com/danqing-ya
 ---
 
 ## 🏗️ Architecture Overview
-
+```text
 Skeleton SQL Server (34 DBs) AWS MySQL Azure MySQL
 ↓                                ↓          ↓
 extract.py ──────────────────────────────────────────┘
@@ -42,7 +42,26 @@ Processed Layer (SQL)
 Analytics Layer (SQL)
 ↓
 Looker Studio Dashboard
+```
 
+
+```markdown
+```mermaid
+flowchart TD
+    A[Skeleton SQL Server (34 DBs)]
+    B[AWS MySQL]
+    C[Azure MySQL]
+
+    A --> D[extract.py]
+    B --> D
+    C --> D
+
+    D --> E[load.py → BigQuery (42ah dataset)]
+    E --> F[Raw Layer (SQL)]
+    F --> G[Processed Layer (SQL)]
+    G --> H[Analytics Layer (SQL)]
+    H --> I[Looker Studio Dashboard]
+```
 
 ---
 
