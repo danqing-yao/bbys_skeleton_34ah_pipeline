@@ -192,9 +192,28 @@ CONFIG = {
 Access: https://lookerstudio.google.com/s/ih_glLZb8FA
 
 **How to Refresh**
-- Re-run SQL scripts
+- Re-run python main.py
 - Open Looker Studio dashboard
-- Click Refresh data on the data source connected to barnebys-skeleton.pilot_olsens
+- Click Refresh data on the data source connected to barnebys-skeleton.42ah
 
+---
+
+## 📚 Documentation
+
+**Full Technical Documentation (Google Docs):**  
+🔗 https://docs.google.com/document/d/1UemCfsODSEHuGlu_8wZPwi1mgvJoPzobT7vLrE_svI0/edit?usp=sharing
+
+Covers: 
+- Executive Summary
+- Business Context
+- Data Architecture
+- Python Extraction Layer
+- Data Processing Logic
+- Metrics Definition
+- Known Issues & Limitations
+- SQL Scripts Reference
+- Long-term Strategy and Scalability
+- Dashboard
+- Appendix
 
 ---
