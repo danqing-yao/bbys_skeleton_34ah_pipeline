@@ -29,7 +29,7 @@ An expansion of the [Olséns pilot analysis](link: https://github.com/danqing-ya
 ## 🏗️ Architecture Overview
 
 ```text
-                                                Manual CSV Upload
+                                              Manual CSV Upload
                                          (auction_house, currency_eur,
                                           skeleton_pricing)
                                                      ↓
@@ -52,23 +52,6 @@ Skeleton SQL Server (34 DBs)    AWS MySQL    Azure MySQL    BigQuery (Bite table
 ```
 
 
-
-```text
-Skeleton SQL Server (34 DBs) AWS MySQL Azure MySQL
-↓                                ↓          ↓
-extract.py ──────────────────────────────────────────┘
-↓
-load.py → BigQuery (42ah dataset)
-(UPLOAD .csv files to BigQuery : clicks/registrations/bids from BITE, auction_house, currency_eur, skeleton_pricing))
-↓
-Raw Layer (SQL)
-↓
-Processed Layer (SQL)
-↓
-Analytics Layer (SQL)
-↓
-Looker Studio Dashboard
-```
 
 ---
 
