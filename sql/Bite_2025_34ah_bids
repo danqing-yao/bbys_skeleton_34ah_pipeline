@@ -1,0 +1,88 @@
+-- Query 42 auction houses bids data 2025 - Filling empty inventoryId
+WITH extracted_data AS (
+  SELECT
+    programId,
+    CASE
+      WHEN programId = 'arosfrimarken'                        THEN '3915'
+      WHEN programId = 'bruketauktion'                        THEN '3952'
+      WHEN programId = '605'                                  THEN '3768'
+      WHEN programId = 'skeleton'
+        AND STARTS_WITH(url, 'https://www.conap.se')          THEN '3902'
+      WHEN programId = 'skeleton'
+        AND STARTS_WITH(url, 'https://www.dyrgripen.se')      THEN '53'
+      ELSE programId
+    END AS new_programId,
+    url,
+    category,
+    action,
+    label,
+    value,
+    currency,
+    source,
+    sessionId,
+    timestamp,
+    REGEXP_EXTRACT(
+      REGEXP_EXTRACT(url, r'^[^?]+'),
+      r'(\d+)$'
+    ) AS inventoryId_original
+  FROM `barnebys-analytics.tracking.events`
+  WHERE
+    timestamp >= DATETIME("2024-12-01")
+    AND timestamp < DATETIME("2026-01-01")
+    AND category = 'bid'
+    AND action = 'placed'
+    AND value IS NOT NULL
+    AND TRIM(value) != ''
+    AND LENGTH(value) > 0
+),
+
+-- Filter to target auction houses after programId remapping
+filtered_data AS (
+  SELECT *
+  FROM extracted_data
+  WHERE new_programId IN (
+    '3915', '3952', '3862', '3900', '3902', '3898', '44',
+  '53', '230', '3922', '90', '3768', '3031', '3601', '3756', '2949', 
+  '3849', '107', '2659', '3925', '72', '3687', '125', '3865', '3950', '3723', 
+  '3923', '3904', '283', '3764', '3722', '3869', '3663', '3916'
+  )
+),
+
+-- Filling empty inventoryId
+filled_inventoryId AS (
+  SELECT
+    new_programId AS programId,
+    url,
+    category,
+    action,
+    label,
+    value,
+    currency,
+    source,
+    sessionId,
+    timestamp,
+    inventoryId_original,
+    COALESCE(
+      inventoryId_original,
+      FIRST_VALUE(inventoryId_original IGNORE NULLS) OVER (
+        PARTITION BY new_programId, label
+        ORDER BY CASE WHEN inventoryId_original IS NOT NULL THEN 0 ELSE 1 END
+      )
+    ) AS inventoryId
+  FROM filtered_data
+)
+
+SELECT
+  programId,
+  inventoryId,
+  url,
+  category,
+  action,
+  label,
+  value,
+  currency,
+  source,
+  sessionId,
+  timestamp
+FROM filled_inventoryId
+ORDER BY timestamp
